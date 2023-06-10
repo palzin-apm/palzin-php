@@ -22,7 +22,7 @@ composer require palzin-apm/palzin-php
 
 ## Use
 
-To start sending data to Palzin APM you need an BUGTRAP Key to create an instance of the `Configuration` class.
+To start sending data to Palzin APM you need an INGESTION Key to create an instance of the `Configuration` class.
 You can obtain `PALZIN_APM_INGESTION_KEY` creating a new project in your [Palzin APM](https://www.palzin.app) dashboard.
 
 ```php
