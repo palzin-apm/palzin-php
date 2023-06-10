@@ -1,0 +1,32 @@
+{
+    "name": "palzin-apm/palzin-php",
+    "description": "Monitoring Package",
+    "keywords": ["monitoring", "php", "palzin"],
+    "license": "MIT",
+
+    "authors": [{
+        "name": "Palzin Team",
+        "email": "hello@palzin.app"
+    }],
+    "require": {
+        "php": ">=7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Palzin\\": "src/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require-dev": {
+        "phpunit/phpunit": "^8.0"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Palzin\\Tests\\": "tests/"
+        }
+    }
+}
