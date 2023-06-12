@@ -15,7 +15,7 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration('aaa');
         $this->assertSame('aaa', $configuration->getIngestionKey());
 
-        $this->assertSame('https://www.palzin.app/api/1/store', $configuration->getUrl());
+        $this->assertSame('https://demo.palzin.app/api/1/store', $configuration->getUrl());
         $this->assertSame([], $configuration->getOptions());
         $this->assertSame('async', $configuration->getTransport());
         $this->assertSame(true, $configuration->isEnabled());
