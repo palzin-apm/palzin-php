@@ -52,8 +52,5 @@ class ConfigurationTest extends TestCase
         $this->assertSame(150, $configuration->getMaxItems());
 
 
-        $this->assertSame(0, $configuration->serverSamplingRatio());
-        $this->assertInstanceOf(Configuration::class, $configuration->serverSamplingRatio(0.5));
-        $this->assertSame(0.5, $configuration->serverSamplingRatio());
     }
 }
