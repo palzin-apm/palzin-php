@@ -13,8 +13,7 @@ use Palzin\Models\Partials\User;
 class Transaction extends PerformanceModel
 {
     const MODEL_NAME = 'transaction';
-    const TYPE_REQUEST = 'request';
-    const TYPE_PROCESS = 'process';
+
 
     /**
      * Transaction constructor.
@@ -23,20 +22,40 @@ class Transaction extends PerformanceModel
      * @param null|string $type
      * @throws Exception
      */
-    public function __construct($name, $type = null)
+    public function __construct(string $name)
     {
         $this->model = self::MODEL_NAME;
         $this->name = $name;
-        $this->type = $type ?? !empty($_SERVER['REQUEST_METHOD']) ? self::TYPE_REQUEST : self::TYPE_PROCESS;
+        $this->type = 'transaction';
         $this->hash = $this->generateUniqueHash();
         $this->host = new Host();
 
-        if ($this->type === self::TYPE_REQUEST) {
-            $this->http = new Http();
-        }
+
     }
 
+    /**
+     * Mark the current transaction as an HTTP request.
+     *
+     * @return $this
+     */
+    public function markAsRequest()
+    {
+        $this->setType('request');
+        $this->http = new Http();
+        return $this;
+    }
 
+    /**
+     * Set the type to categorize the transaction.
+     *
+     * @param string $type
+     * @return $this
+     */
+    public function setType(string $type)
+    {
+        $this->type = $type;
+        return $this;
+    }
 
     /**
      * Attcach user information.

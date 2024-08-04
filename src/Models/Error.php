@@ -34,12 +34,7 @@ class Error extends Arrayable
         $this->file = $throwable->getFile();
         $this->line = $throwable->getLine();
         $this->code = $throwable->getCode();
-
-        $this->stack = $this->stackTraceToArray(
-            $throwable->getTrace(),
-            $throwable->getFile(),
-            $throwable->getLine()
-        );
+        $this->stack = $this->stackTraceToArray($throwable);
 
         $this->transaction = $transaction->only(['name', 'hash']);
     }
@@ -59,17 +54,21 @@ class Error extends Arrayable
     /**
      * Serialize stack trace to array
      *
-     * @param array $stackTrace
-     * @param null|string $topFile
-     * @param null|string $topLine
+     * @param \Throwable $throwable
      * @return array
      */
-    public function stackTraceToArray(array $stackTrace, $topFile = null, $topLine = null)
+    public function stackTraceToArray(\Throwable $throwable)
     {
         $stack = [];
         $counter = 0;
 
-        foreach ($stackTrace as $trace) {
+        $stack[] = [
+            'file' => $throwable->getFile(),
+            'line' => $throwable->getLine(),
+            'code' => $this->getCode($throwable->getFile(), $throwable->getLine()),
+        ];
+
+        foreach ($throwable->getTrace() as $trace) {
             // Exception object `getTrace` does not return file and line number for the first line
             // http://php.net/manual/en/exception.gettrace.php#107563
             if (isset($topFile, $topLine) && $topFile && $topLine) {
@@ -79,11 +78,6 @@ class Error extends Arrayable
                 unset($topFile, $topLine);
             }
 
-            // Exclude vendor folder
-            /*if (array_key_exists('file', $trace) && strpos($trace['file'], 'vendor') !== false) {
-                continue;
-            }*/
-
             $stack[] = [
                 'class' => isset($trace['class']) ? $trace['class'] : null,
                 'function' => isset($trace['function']) ? $trace['function'] : null,
@@ -91,13 +85,16 @@ class Error extends Arrayable
                 'type' => $trace['type'] ?? 'function',
                 'file' => $trace['file'] ?? '[internal]',
                 'line' => $trace['line'] ?? '0',
-                'code' => isset($trace['file']) ? $this->getCode($trace['file'], $trace['line'] ?? '0') : [],
+                'code' => isset($trace['file'])
+                    ? $this->getCode($trace['file'], $trace['line'] ?? '0')
+                    : [],
+                'in_app' => isset($trace['file'])
+                    ? strpos($trace['file'], 'vendor') === false
+                    : false,
             ];
 
-            $counter++;
-
             // Reporting limit
-            if ($counter >= 50) {
+            if (++$counter >= 50) {
                 break;
             }
         }
@@ -152,9 +149,6 @@ class Error extends Arrayable
      */
     public function getCode($filePath, $line, $linesAround = 5)
     {
-        if (!$filePath || !$line) {
-            return null;
-        }
 
         try {
             $file = new \SplFileObject($filePath);
@@ -164,17 +158,18 @@ class Error extends Arrayable
             $codeLines = [];
 
             $from = max(0, $line - $linesAround);
-            $to = min($line + $linesAround, $file->key() + 1);
+            $to = min($line + $linesAround, $file->key());
 
             $file->seek($from);
 
             while ($file->key() < $to && !$file->eof()) {
-                $file->next();
+
                 // `key()` returns 0 as the first line
                 $codeLines[] = [
-                    'line' => $file->key(),
+                    'line' => $file->key() + 1,
                     'code' => rtrim($file->current()),
                 ];
+                $file->next();
             }
 
             return $codeLines;

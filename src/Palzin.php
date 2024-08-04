@@ -240,11 +240,11 @@ class Palzin
     public function reportException(\Throwable $exception, $handled = true)
     {
 
-        if ($this->needTransaction()) {
+        if ($this->hasTransaction()) {
             $this->startTransaction(get_class($exception));
         }
 
-        $segment = $this->startSegment('exception', substr($exception->getMessage(), 0, 50));
+        $segment = $this->startSegment('exception', $exception->getMessage());
 
         $error = (new Error($exception, $this->transaction))
             ->setHandled($handled);
@@ -264,9 +264,11 @@ class Palzin
      */
     public function addEntries($entries)
     {
-        $entries = is_array($entries) ? $entries : [$entries];
-        foreach ($entries as $entry) {
-            $this->transport->addEntry($entry);
+        if ($this->isRecording()) {
+            $entries = is_array($entries) ? $entries : [$entries];
+            foreach ($entries as $entry) {
+                $this->transport->addEntry($entry);
+            }
         }
         return $this;
     }
@@ -290,6 +292,7 @@ class Palzin
     public function flush()
     {
         if (!$this->isRecording() || !$this->hasTransaction()) {
+            $this->reset();
             return;
         }
 
@@ -300,13 +303,24 @@ class Palzin
 
         foreach (static::$beforeCallbacks as $callback) {
             if (call_user_func($callback, $this) === false) {
-                $this->transport->resetQueue();
-                unset($this->transaction);
+                $this->reset();
                 return;
             }
         }
 
         $this->transport->flush();
         unset($this->transaction);
+    }
+
+    /**
+     * Cancel the current transaction, segments, and errors.
+     *
+     * @return Inspector
+     */
+    public function reset()
+    {
+        $this->transport->resetQueue();
+        unset($this->transaction);
+        return $this;
     }
 }

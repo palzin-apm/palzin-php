@@ -6,28 +6,31 @@ namespace Palzin\Models;
 
 trait HasContext
 {
+
+
     /**
      * Add contextual information.
+     * If the key exists it merge the given data instead of overwrite.
      *
-     * @param string $label
+     * @param string $key
      * @param mixed $data
      * @return $this
      */
-    public function addContext($label, $data)
+    public function addContext($key, $data)
     {
-        $this->context[$label] = $data;
+        $this->context[$key] = $data;
         return $this;
     }
 
     /**
-     * Set context.
+     * Set the entire context bag.
      *
      * @param array $context
      * @return $this
      */
-    public function setContext(array $context)
+    public function setContext(array $data)
     {
-        $this->context = $context;
+        $this->context = $data;
         return $this;
     }
 

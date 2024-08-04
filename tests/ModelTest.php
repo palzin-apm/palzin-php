@@ -32,9 +32,8 @@ class ModelTest extends TestCase
 
     public function testTransactionData()
     {
-        $this->assertSame($this->palzin->currentTransaction()::MODEL_NAME, $this->palzin->currentTransaction()->model);
-        $this->assertSame($this->palzin->currentTransaction()::TYPE_PROCESS, $this->palzin->currentTransaction()->type);
-        $this->assertSame('testcase', $this->palzin->currentTransaction()->name);
+        $this->assertSame($this->palzin->transaction()::MODEL_NAME, $this->palzin->transaction()->model);
+        $this->assertSame('request', $this->palzin->transaction()->setType('request')->type);
     }
 
     public function testSegmentData()
@@ -45,7 +44,7 @@ class ModelTest extends TestCase
         $this->assertSame($segment::MODEL_NAME, $segment->model);
         $this->assertSame(__FUNCTION__, $segment->type);
         $this->assertSame('hello segment!', $segment->label);
-        $this->assertSame($this->palzin->currentTransaction()->only(['name','hash', 'timestamp']), $segment->transaction);
+        $this->assertSame($this->palzin->transaction()->only(['name', 'hash', 'timestamp']), $segment->transaction);
         $this->assertArrayHasKey('host', $segment);
     }
 
@@ -64,14 +63,14 @@ class ModelTest extends TestCase
         $this->assertArrayHasKey('host', $error_arr);
 
         $this->assertSame($error::MODEL_NAME, $error->model);
-        $this->assertSame($this->palzin->currentTransaction()->only(['name', 'hash']), $error->transaction);
+        $this->assertSame($this->palzin->transaction()->only(['name', 'hash']), $error->transaction);
     }
 
     public function testSetContext()
     {
-        $this->palzin->currentTransaction()->addContext('test', ['foo' => 'bar']);
+        $this->palzin->transaction()->addContext('test', ['foo' => 'bar']);
 
-        $this->assertEquals(['test' => ['foo' => 'bar']], $this->palzin->currentTransaction()->context);
+        $this->assertEquals(['test' => ['foo' => 'bar']], $this->palzin->transaction()->getContext());
     }
 
 

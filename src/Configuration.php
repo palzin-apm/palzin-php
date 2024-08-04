@@ -39,7 +39,7 @@ class Configuration
     /**
      * @var string
      */
-    protected $version = '23.11.05';
+    protected $version = '24.8.1';
 
     /**
      * Transport options.
@@ -56,7 +56,7 @@ class Configuration
      */
     public function __construct($ingestionKey = null)
     {
-        if(!is_null($ingestionKey)  && !empty($ingestionKey)) {
+        if(!empty($ingestionKey)) {
             $this->setIngestionKey($ingestionKey);
         }
     }

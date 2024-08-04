@@ -35,7 +35,7 @@ class ExceptionEncoderTest extends TestCase
         $message = 'Test Message';
         $exception = new \DomainException($message, $code);
 
-        $error = new Error($exception, $this->palzin->currentTransaction());
+        $error = new Error($exception, $this->palzin->transaction());
 
         $this->assertSame($message, $error['message']);
         $this->assertSame('DomainException', $error['class']);
@@ -63,13 +63,13 @@ class ExceptionEncoderTest extends TestCase
         $this->assertTrue($vendor);
 
         $this->assertSame($originalStackTrace[0]['function'], $error['stack'][0]['function']);
-        $this->assertSame($originalStackTrace[0]['class'], $error['stack'][0]['class']);
+        $this->assertSame($originalStackTrace[0]['class'], $error['stack'][1]['class']);
     }
 
     public function testEmptyExceptionMessageCase()
     {
         $exception = new \DomainException;
-        $error = new Error($exception, $this->palzin->currentTransaction());
+        $error = new Error($exception, $this->palzin->transaction());
 
         $this->assertSame('DomainException', $error['message']);
     }
