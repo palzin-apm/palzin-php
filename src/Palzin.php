@@ -315,7 +315,7 @@ class Palzin
     /**
      * Cancel the current transaction, segments, and errors.
      *
-     * @return Inspector
+     * @return Palzin
      */
     public function reset()
     {
