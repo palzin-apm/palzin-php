@@ -19,7 +19,6 @@ class Transaction extends PerformanceModel
      * Transaction constructor.
      *
      * @param string $name
-     * @param null|string $type
      * @throws Exception
      */
     public function __construct(string $name)
