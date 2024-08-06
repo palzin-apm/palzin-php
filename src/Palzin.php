@@ -240,7 +240,7 @@ class Palzin
     public function reportException(\Throwable $exception, $handled = true)
     {
 
-        if ($this->hasTransaction()) {
+        if (!$this->hasTransaction()) {
             $this->startTransaction(get_class($exception));
         }
 
